@@ -5,6 +5,7 @@ using _Project.Scripts;
 using _Project.UI.Scripts.Control_Panel;
 using _Project.UI.Scripts.Main_Menu;
 using _Project.UI.Scripts.Render_Image_Window;
+using _Project.UI.Scripts.UV_Window;
 using _Project.UI.Scripts.Toolbar;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -48,6 +49,10 @@ namespace _Project.UI.Scripts
             get { return renderedImageWindow; }
             private set { renderedImageWindow = value; }
         }
+
+        [SerializeField]
+        private UVWindow uvWindow;
+        public UVWindow UVWindow{get; private set;}
         
         private static UIManager instance = null;
 

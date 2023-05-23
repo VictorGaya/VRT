@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using _Project.Ray_Tracer.Scripts.RT_Scene;
+using UnityEngine.Rendering.ShaderGraph;
 
 namespace _Project.Ray_Tracer.Scripts.RT_Texture
 {
@@ -10,16 +11,16 @@ namespace _Project.Ray_Tracer.Scripts.RT_Texture
     {
         private RTMesh mesh;
         private GameObject uvView;
-        private Material uvMaterial;
-        private Shader uvShader;
-        private Shader vfeShader;
+        // private Material uvMaterial;
+        // private Shader uvShader;
+        // private Shader vfeShader;
 
         public enum Mode{Vertex, Face, Edge}
         [SerializeField]
         private Mode viewMode = Mode.Vertex;
         public Mode ViewMode{
             get{return viewMode;}
-            set{viewMode = value; UpdateMaterialProperties();}
+            set{viewMode = value;}
         }
 
         [SerializeField]
@@ -32,8 +33,8 @@ namespace _Project.Ray_Tracer.Scripts.RT_Texture
         private void Awake()
         {
             mesh = GetComponent<RTMesh>();
-            AddView();
-            AddMatShader();
+            AddUVObject();
+            AddShader("Shader Graphs/UVProject");
         }
         private void Start()
         {
@@ -50,32 +51,40 @@ namespace _Project.Ray_Tracer.Scripts.RT_Texture
             uvView.SetActive(false);
         }
 
-        private void AddView()
+        private void AddUVObject()
         {
             uvView = new GameObject(mesh.name + "_UV", typeof(MeshFilter), typeof(MeshRenderer));
             uvView.gameObject.layer = LayerMask.NameToLayer("UVCamera");
             uvView.transform.parent = mesh.transform;
             uvView.GetComponent<MeshFilter>().mesh = mesh.GetComponent<MeshFilter>().mesh;
+            uvView.GetComponent<MeshRenderer>().materials = new Material[0];
             // uvView.SetActive(false);
         }
 
-        private void AddMatShader()
+        private void AddShader(string name)
         {
-            uvShader = Shader.Find("Custom/UvShader");
-            uvMaterial = new Material(uvShader);
-            uvMaterial.mainTexture = mesh.GetComponent<MeshRenderer>().material.mainTexture;
-            uvView.GetComponent<MeshRenderer>().material = uvMaterial;
+            var materials = uvView.GetComponent<MeshRenderer>().materials.ToList();
+            materials.Add(new Material(Shader.Find(name)));
+            uvView.GetComponent<MeshRenderer>().materials = materials.ToArray();
         }
 
-        private void UpdateMaterialProperties()
-        {
-            foreach (string mode in System.Enum.GetNames(typeof(Mode))){
-                if (mode == viewMode.ToString()){
-                    uvMaterial.EnableKeyword(mode.ToUpper());
-                } else {
-                    uvMaterial.DisableKeyword(mode.ToUpper());
-                }
-            }
-            }
+        // private void AddShader(string name)
+        // {
+        //     uvShader = Shader.Find(name);
+        //     uvMaterial = new Material(uvShader);
+        //     uvMaterial.mainTexture = mesh.GetComponent<MeshRenderer>().material.mainTexture;
+        //     uvView.GetComponent<MeshRenderer>().material = uvMaterial;
+        // }
+
+        // private void UpdateViewMode()
+        // {
+        //     foreach (string mode in System.Enum.GetNames(typeof(Mode))){
+        //         if (mode == viewMode.ToString()){
+        //             uvMaterial.EnableKeyword(mode.ToUpper());
+        //         } else {
+        //             uvMaterial.DisableKeyword(mode.ToUpper());
+        //         }
+        //     }
+        // }
     }
 }
