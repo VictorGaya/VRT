@@ -78,7 +78,6 @@ namespace _Project.Scripts
 
         private void OrbitingUpdate()
         {
-            Debug.Log("Orbiting");
             float xDistance = 0.0f;
             float yDistance = 0.0f;
 
