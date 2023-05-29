@@ -34,7 +34,8 @@ namespace _Project.Ray_Tracer.Scripts.RT_Texture
         {
             mesh = GetComponent<RTMesh>();
             AddUVObject();
-            AddShader("Shader Graphs/UVProject");
+            Debug.Log("Add shader");
+            AddShader("Custom/UvShader");
         }
         private void Start()
         {

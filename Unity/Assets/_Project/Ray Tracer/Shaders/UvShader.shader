@@ -6,7 +6,7 @@ Shader "Custom/UvShader"
     {
         [Slider(3.0)]
         _WireframeWidth ("Wireframe width", Range(0., 0.2)) = 0.05
-        _Color ("Color", color) = (1., 0., 0., 1.)
+        _WireframeColor ("Color", color) = (1., 0., 0., 1.)
     }
     SubShader
     {
@@ -30,6 +30,7 @@ Shader "Custom/UvShader"
 
         Pass
         {
+            Name "Wireframe"
             Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
             // Stencil {
             //     Ref 1
@@ -61,18 +62,18 @@ Shader "Custom/UvShader"
             // }
 
             float4 vert(appdata_base v) : SV_POSITION {
-                return UnityObjectToClipPos(v.texcoord);
+                return UnityObjectToClipPos(v.vertex);
             }
 
             [maxvertexcount(3)]
             void geom(triangle float4 input[3] : SV_POSITION, inout TriangleStream<g2f> triStream) {
                 g2f o;
-                for (int i = 0; i < 3; i++) {
-                    o.pos = input[i];
-                    o.bary = float3(0., 0., 0.);
-                    o.bary[i] = 1.0;
-                    triStream.Append(o);
-                }
+                // for (int i = 0; i < 3; i++) {
+                //     o.pos = input[i];
+                //     o.bary = float3(0., 0., 0.);
+                //     o.bary[i] = 1.0;
+                //     triStream.Append(o);
+                // }
                 o.pos = mul(UNITY_MATRIX_VP, input[0]);
                 o.bary = float3(1., 0., 0.);
                 triStream.Append(o);
@@ -84,8 +85,8 @@ Shader "Custom/UvShader"
                 triStream.Append(o);
             }
 
-            float _WireframeWidth;
-            fixed4 _Color;
+            uniform float _WireframeWidth;
+            uniform fixed4 _WireframeColor;
 
             fixed4 frag(g2f i) : SV_Target {
 #if defined (VERTEX)
@@ -94,15 +95,16 @@ Shader "Custom/UvShader"
 #elif defined (EDGE)
                     if(!any(bool3(i.bary.x < _WireframeWidth, i.bary.y < _WireframeWidth, i.bary.z < _WireframeWidth)))
                         discard;
-#elif defined (FACE) 
+// #elif defined (FACE) 
+#else
                     float3 dist = abs(i.bary - float3(1./3., 1./3., 1./3.));
                     float maxDist = max(max(dist.x, dist.y), dist.z);
                     if(maxDist > _WireframeWidth)
                         discard;
-#else
-                    discard;
+// #else
+//                     discard;
 #endif
-                return _Color;
+                return _WireframeColor;
             }
 
             ENDCG

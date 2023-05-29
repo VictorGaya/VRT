@@ -16,6 +16,9 @@ Shader "Custom/RayTracerShader"
         _Specular("Specular", Range(0, 1)) = 0.5
         _Shininess("Shininess", Float) = 32
         _RefractiveIndex("RefractiveIndex", Range(1,1)) = 1
+        [Slider(3.0)]
+        _WireframeWidth ("Wireframe width", Range(0., 0.2)) = 0.05
+        _WireframeColor ("Wireframe color", Color) = (0., 0., 0., 1.)
     }
 
     SubShader
@@ -35,6 +38,7 @@ Shader "Custom/RayTracerShader"
         }
 
         UsePass "Custom/LightShader/LIGHTPASS"
+        UsePass "Custom/UvShader/WIREFRAME"
     }
 
     FallBack "VertexLit" // Any fall back shader that supports casting shadows will do.
